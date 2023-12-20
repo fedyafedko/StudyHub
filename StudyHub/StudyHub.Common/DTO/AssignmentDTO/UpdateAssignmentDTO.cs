@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.Common.DTO.AssignmentDTO;
+
 public class UpdateAssignmentDTO
 {
     public string Title { get; set; } = string.Empty;

@@ -1,11 +1,10 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
 using StudyHub.BLL.Services.Interfaces;
 using StudyHub.Common.DTO.AuthDTO;
 using StudyHub.Common.Exceptions;
+using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
 
 namespace StudyHub.BLL.Services;
 
@@ -13,15 +12,22 @@ public class AuthService : IAuthService
 {
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
-    private readonly TokenValidationParameters _tokenValidationParametrs;
+    private readonly IRepository<InvitedUser> _invitedUserRepository;
+    private readonly IRepository<Teacher> _teacherRepository;
+    private readonly IRepository<Student> _studentRepository;
+
     public AuthService(
         UserManager<User> userManager,
         ITokenService tokenService,
-        TokenValidationParameters tokenValidationParameters)
+        IRepository<InvitedUser> invitedUserRepository,
+        IRepository<Teacher> teacherRepository,
+        IRepository<Student> studentRepository)
     {
+        _invitedUserRepository = invitedUserRepository;
         _userManager = userManager;
         _tokenService = tokenService;
-        _tokenValidationParametrs = tokenValidationParameters;
+        _teacherRepository = teacherRepository;
+        _studentRepository = studentRepository;
     }
 
     public async Task<AuthSuccessDTO> LoginAsync(LoginUserDTO user)
@@ -36,13 +42,19 @@ public class AuthService : IAuthService
         if (!isPasswordValid)
             throw new InvalidCredentialsException($"User input incorrect password. Password: {user.Password}");
 
-        return new AuthSuccessDTO(
-            _tokenService.GenerateJwtToken(existingUser), 
+        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(existingUser, (await _userManager.GetRolesAsync(existingUser)).ToArray()),
             _tokenService.GenerateRefreshTokenAsync(existingUser));
     }
 
     public async Task<AuthSuccessDTO> RegisterAsync(RegisterUserDTO user)
     {
+        var invitedUser = _invitedUserRepository.FirstOrDefault(e => e.Email == user.Email);
+        if (invitedUser == null)
+            throw new NotFoundException($"You doesn't invited by this email:{user.Email}");
+
+        if(invitedUser.Token != user.Token)
+            throw new IncorrectParametersException("Token does not exist");
+
         var existingUser = await _userManager.FindByEmailAsync(user.Email);
 
         if (existingUser != null)
@@ -58,15 +70,38 @@ public class AuthService : IAuthService
 
         if (!result.Succeeded)
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+        if (invitedUser.Role == "Teacher")
+        {
+            var newTeacher = new Teacher()
+            {
+                User = newUser,
+                UserId = newUser.Id,
+            };  
+            await _teacherRepository.InsertAsync(newTeacher);
+        }
 
-        return new AuthSuccessDTO(
-            _tokenService.GenerateJwtToken(newUser), 
+        if (invitedUser.Role == "Student")
+        {
+            var newStudent = new Student()
+            {
+                User = newUser,
+                UserId = newUser.Id,
+            };
+            await _studentRepository.InsertAsync(newStudent);
+        }
+
+        var addRoleResult = await _userManager.AddToRoleAsync(newUser, invitedUser.Role);
+
+        if (!addRoleResult.Succeeded)
+            throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+
+        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(newUser , (await _userManager.GetRolesAsync(newUser)).ToArray()), 
             _tokenService.GenerateRefreshTokenAsync(newUser));
     }
 
     public async Task<AuthSuccessDTO> RefreshTokenAsync(string accessToken, string refreshToken)
     {
-        var validatedToken = GetPrincipalFromToken(accessToken);
+        var validatedToken = _tokenService.GetPrincipalFromToken(accessToken);
 
         var expiryDateUnix = long.Parse(validatedToken!.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
 
@@ -89,36 +124,7 @@ public class AuthService : IAuthService
         if (user.RefreshToken.Token != refreshToken)
             throw new IncorrectParametersException("Refresh token is invalid");
 
-        return new AuthSuccessDTO(
-            _tokenService.GenerateJwtToken(user!), 
+        return new AuthSuccessDTO(_tokenService.GenerateJwtToken(user!, (await _userManager.GetRolesAsync(user)).ToArray()), 
             _tokenService.GenerateRefreshTokenAsync(user!));
-    }
-
-    private ClaimsPrincipal GetPrincipalFromToken(string token)
-    {
-        var jwtTokenHandler = new JwtSecurityTokenHandler();
-        var validationParametrs = _tokenValidationParametrs.Clone();
-        validationParametrs.ValidateLifetime = false;
-        try
-        {
-            var principal = jwtTokenHandler.ValidateToken(token, validationParametrs, out var validatedToken);
-
-            if (!IsJwtWithValidSecurityAlgorithm(validatedToken))
-                throw new InvalidSecurityAlgorithmException("Current token does not have right security algorithm");
-
-            return principal;
-        }
-        catch
-        {
-            throw new TokenValidatorException("Something went wrong with token validator");
-        }
-    }
-
-    private bool IsJwtWithValidSecurityAlgorithm(SecurityToken validatedToken)
-    {
-        return validatedToken is JwtSecurityToken jwtSecurityToken &&
-            jwtSecurityToken.Header.Alg.Equals(
-                SecurityAlgorithms.HmacSha256,
-                StringComparison.InvariantCultureIgnoreCase);
     }
 }

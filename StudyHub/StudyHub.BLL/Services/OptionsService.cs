@@ -5,6 +5,7 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
+
 public class OptionsService : IOptionsService
 {
     private readonly IRepository<AssignmentTaskOptionBase> _optionRepository;

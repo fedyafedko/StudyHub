@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudyHub.Entities;
+
 public class Subject : EntityBase
 {
     [ForeignKey(nameof(Teacher))]

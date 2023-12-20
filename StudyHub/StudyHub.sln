@@ -9,9 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyHub.Entities", "Entiti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyHub.DAL", "StudyHub.DAL\StudyHub.DAL.csproj", "{EF1DA920-AC1A-45E8-A82C-A0820B53AA00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyHub.BLL", "StudyHub.BLL\StudyHub.BLL.csproj", "{0AE573C4-5A6B-4F15-9179-C0E9F8164251}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyHub.BLL", "StudyHub.BLL\StudyHub.BLL.csproj", "{0AE573C4-5A6B-4F15-9179-C0E9F8164251}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyHub.Common", "StudyHub.Common\StudyHub.Common.csproj", "{EA346829-DC88-4FBB-B163-B9399830EDDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StudyHub.Common", "StudyHub.Common\StudyHub.Common.csproj", "{EA346829-DC88-4FBB-B163-B9399830EDDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudyHub.FluentEmail", "StudyHub.FluentEmail\StudyHub.FluentEmail.csproj", "{616AAC67-17C5-4AC8-9277-9E256ECDE3CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{EA346829-DC88-4FBB-B163-B9399830EDDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA346829-DC88-4FBB-B163-B9399830EDDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA346829-DC88-4FBB-B163-B9399830EDDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{616AAC67-17C5-4AC8-9277-9E256ECDE3CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{616AAC67-17C5-4AC8-9277-9E256ECDE3CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{616AAC67-17C5-4AC8-9277-9E256ECDE3CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{616AAC67-17C5-4AC8-9277-9E256ECDE3CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

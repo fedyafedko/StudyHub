@@ -5,6 +5,7 @@ using System.Collections;
 using System.Linq.Expressions;
 
 namespace StudyHub.DAL.Repositories;
+
 public class Repository<TEntity> : IRepository<TEntity>
     where TEntity : class
 {

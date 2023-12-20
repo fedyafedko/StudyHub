@@ -3,6 +3,7 @@ using StudyHub.Common.DTO.AssignmentDTO;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Profiles;
+
 public class AssignmentProfile : Profile
 {
     public AssignmentProfile()

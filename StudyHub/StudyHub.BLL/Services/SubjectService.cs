@@ -7,6 +7,7 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
+
 public class SubjectService : ISubjectService
 {
     private readonly IRepository<Subject> _subjectRepository;

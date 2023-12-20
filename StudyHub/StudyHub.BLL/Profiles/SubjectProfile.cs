@@ -3,6 +3,7 @@ using StudyHub.Common.DTO.Subject;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Profiles;
+
 public class SubjectProfile : Profile
 {
     public SubjectProfile()

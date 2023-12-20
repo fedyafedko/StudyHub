@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace StudyHub.Entities;
+
 public class RefreshToken
 {
     [Key]

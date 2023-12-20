@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.Common.Models;
+
 public class GoogleAuthConfig
 {
     public string ClientId { get; set; } = string.Empty;

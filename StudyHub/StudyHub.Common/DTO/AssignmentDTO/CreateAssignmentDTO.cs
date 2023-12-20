@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.Common.DTO.AssignmentDTO;
+
 public class CreateAssignmentDTO
 {
     public Guid SubjectId { get; set; }

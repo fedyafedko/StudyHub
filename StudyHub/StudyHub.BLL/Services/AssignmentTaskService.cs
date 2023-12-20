@@ -7,6 +7,7 @@ using StudyHub.DAL.Repositories.Interfaces;
 using StudyHub.Entities;
 
 namespace StudyHub.BLL.Services;
+
 public class AssignmentTaskService : IAssignmentTaskService
 {
     private readonly IRepository<AssignmentTask> _assignmentTaskRepository;

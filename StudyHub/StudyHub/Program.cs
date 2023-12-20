@@ -16,11 +16,16 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using StudyHub.Validators.AssignmentTaskOptionValidators;
 using Microsoft.OpenApi.Models;
+using StudyHub.Extensions;
+using StudyHub.FluentEmail;
+using StudyHub.Common.DTO;
+using StudyHub.FluentEmail.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.Configure<GoogleAuthConfig>(builder.Configuration.GetSection("GoogleAuth"));
+builder.Services.Configure<MessageSettings>(builder.Configuration.GetSection("EmailSettings"));
 
 builder.Services.AddAutoMapper(typeof(AssignmentTaskProfile));
 
@@ -41,9 +46,18 @@ builder.Services.AddScoped<IOptionsService, OptionsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserInvitingService, UserInvitedService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
+// Fluent Email
+builder.Services.AddFluentEmail(builder.Configuration);
+
+// Seeding 
+builder.Services.AddSeeding();
+ 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
+    .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
 
@@ -118,6 +132,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+await app.ApplySeedingAsync();
 
 app.UseHttpsRedirection();
 app.UseCors(

@@ -1,6 +1,7 @@
 ﻿using StudyHub.Common.DTO.AssignmentTaskOption;
 
 namespace StudyHub.Common.DTO.AssignmentTask;
+
 public class UpdateAssignmentTaskDTO
 {
     public string Label { get; set; } = string.Empty;

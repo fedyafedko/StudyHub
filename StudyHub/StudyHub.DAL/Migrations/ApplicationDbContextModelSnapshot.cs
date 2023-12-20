@@ -239,11 +239,36 @@ namespace StudyHub.DAL.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AssignmentTaskId");
+
                     b.ToTable("AssignmentTaskOptionBase");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("AssignmentTaskOptionBase");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("StudyHub.Entities.InvitedUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InvitedUsers");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.RefreshToken", b =>
@@ -360,10 +385,6 @@ namespace StudyHub.DAL.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -415,10 +436,6 @@ namespace StudyHub.DAL.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("StudyHub.Entities.ChoiceOption", b =>
@@ -428,8 +445,6 @@ namespace StudyHub.DAL.Migrations
                     b.Property<bool>("IsCorrect")
                         .HasColumnType("bit");
 
-                    b.HasIndex("AssignmentTaskId");
-
                     b.HasDiscriminator().HasValue("ChoiceOption");
                 });
 
@@ -437,16 +452,7 @@ namespace StudyHub.DAL.Migrations
                 {
                     b.HasBaseType("StudyHub.Entities.AssignmentTaskOptionBase");
 
-                    b.HasIndex("AssignmentTaskId");
-
                     b.HasDiscriminator().HasValue("OpenEndedOption");
-                });
-
-            modelBuilder.Entity("StudyHub.Entities.Admin", b =>
-                {
-                    b.HasBaseType("StudyHub.Entities.User");
-
-                    b.HasDiscriminator().HasValue("Admin");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -518,7 +524,7 @@ namespace StudyHub.DAL.Migrations
             modelBuilder.Entity("StudyHub.Entities.Assignment", b =>
                 {
                     b.HasOne("StudyHub.Entities.Subject", "Subject")
-                        .WithMany()
+                        .WithMany("Assignments")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -535,6 +541,17 @@ namespace StudyHub.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Assignment");
+                });
+
+            modelBuilder.Entity("StudyHub.Entities.AssignmentTaskOptionBase", b =>
+                {
+                    b.HasOne("StudyHub.Entities.AssignmentTask", "Task")
+                        .WithMany("Options")
+                        .HasForeignKey("AssignmentTaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Task");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.RefreshToken", b =>
@@ -600,36 +617,24 @@ namespace StudyHub.DAL.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("StudyHub.Entities.ChoiceOption", b =>
-                {
-                    b.HasOne("StudyHub.Entities.AssignmentTask", "Task")
-                        .WithMany()
-                        .HasForeignKey("AssignmentTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Task");
-                });
-
-            modelBuilder.Entity("StudyHub.Entities.OpenEndedOption", b =>
-                {
-                    b.HasOne("StudyHub.Entities.AssignmentTask", "Task")
-                        .WithMany()
-                        .HasForeignKey("AssignmentTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Task");
-                });
-
             modelBuilder.Entity("StudyHub.Entities.Assignment", b =>
                 {
                     b.Navigation("Tasks");
                 });
 
+            modelBuilder.Entity("StudyHub.Entities.AssignmentTask", b =>
+                {
+                    b.Navigation("Options");
+                });
+
             modelBuilder.Entity("StudyHub.Entities.Student", b =>
                 {
                     b.Navigation("SelectedOptions");
+                });
+
+            modelBuilder.Entity("StudyHub.Entities.Subject", b =>
+                {
+                    b.Navigation("Assignments");
                 });
 
             modelBuilder.Entity("StudyHub.Entities.Teacher", b =>

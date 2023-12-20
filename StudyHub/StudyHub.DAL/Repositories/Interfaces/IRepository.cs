@@ -1,4 +1,5 @@
 ﻿namespace StudyHub.DAL.Repositories.Interfaces;
+
 public interface IRepository<TEntity> : IQueryable<TEntity>, IAsyncEnumerable<TEntity>
 {
     IQueryable<TEntity> FromSqlInterpolated(FormattableString sql);
